@@ -7,25 +7,32 @@
       apt:
         name: nginx-extras
         update_cache: yes
-    - name: Start nginx
-      systemd:
-        name: nginx
-        enabled: yes
-        state: started
     - name: Add index.html
       copy:
-        src: files/index.html
+        src: templates/index.html
         dest: /var/www/html/index.html
         mode: 0664
     - name: Update nginx config
       copy:
-        src: files/nginx.conf.j2
+        src: templates/nginx.conf.j2
         dest: /etc/nginx/nginx.conf
         mode: 0664
-      notify: Reload nginx
-  handlers:
-    - name: Reload nginx
+      notify: Check nginx config
+    - name: Ensure nginx is running
       systemd:
         name: nginx
-        daemon_reload: true
-        state: reloaded
+        enabled: yes
+        state: started
+  handlers:
+    - name: Check nginx config
+      shell: "nginx -t"
+      register: nginx_config_status
+      ignore_errors: true
+      notify: Restart nginx
+    - name: Restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      when: nginx_config_status.rc == 0
