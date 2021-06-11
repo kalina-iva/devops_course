@@ -1,22 +1,34 @@
 #!/bin/bash
 
-case $1 in
+ACTION=$1
+PORT="${2:-80}"
+IMAGE="nginx-kalina"
+CONTAINER="nginx-container-kalina"
+
+case $ACTION in
 create)
-  docker build -t test-nginx . &&
+  echo 'creating...'
+  docker build -t $IMAGE . &&
     docker run -d \
-      --name nginx-kalina \
-      -p 8080:80 \
-      test-nginx
+      --name $CONTAINER \
+      -p $PORT:80 \
+      $IMAGE
   ;;
 start)
-  docker run -d \
-    --name nginx-kalina \
-    -p 8080:80 \
-    test-nginx
+  echo 'starting...'
+  docker start $CONTAINER
   ;;
 stop)
-  docker stop nginx-kalina
+  echo 'stopping...'
+  docker stop $CONTAINER
   ;;
-destroy) ;;
-
+destroy)
+  echo 'destroying'
+  docker stop $CONTAINER &&
+    docker rm $CONTAINER &&
+    docker rmi $IMAGE
+  ;;
+*)
+  echo 'what should I do? example, ./manage-docker.sh start'
+  ;;
 esac
