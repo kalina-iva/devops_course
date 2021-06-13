@@ -1,0 +1,11 @@
+---
+- name: Install defaults packages
+  apt:
+    name:
+      - iotop
+      - htop
+      - mc
+      - net-tools
+      - ca-certificates
+    update_cache: yes
+    autoremove: yes

@@ -1,0 +1,5 @@
+---
+postgres_version: 12
+postgres_user: postgres
+postgres_pass: password
+postgres_port: 5432

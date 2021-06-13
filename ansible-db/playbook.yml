@@ -1,0 +1,6 @@
+---
+- name: set up db instance
+  hosts: db_instance
+  remote_user: root
+  roles:
+    - postgres-db
