@@ -1,23 +1,36 @@
 ---
+- name: Add repository PostgreSql key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
 - name: Add PostgreSql repository
   apt_repository:
     repo: deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main
     filename: pgdg
 
-- name: Add repository PostgreSql key
-  apt_key:
-    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
-
-- name: install Postgres
+- name: Install PostgreSql
   apt:
     name:
       - "postgresql-{{ postgres_version }}"
       - "postgresql-client-{{ postgres_version }}"
-#    ignore_errors: "{{ ansible_check_mode }}"
 
-#- name: Copy PostgreSql config
-#  template:
-#    src: postgresql.conf.j2
-#    dest: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
-#    owner: postgres
-#    mode: 0644
+- name: Copy PostgreSql config
+  template:
+    src: postgresql.conf.j2
+    dest: /etc/postgresql/{{ postgres_version }}/main/postgresql.conf
+    owner: postgres
+    mode: 0644
+  notify: Restart PostgreSql
+
+- name: Install packages to change password
+  apt:
+    name:
+      - python3-pip
+      - python3-psycopg2
+
+- name: Change password to postgres user
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    user: "{{ postgres_user }}"
+    password: "{{ postgres_pass }}"
