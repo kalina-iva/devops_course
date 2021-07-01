@@ -5,4 +5,4 @@
       runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
-        - run: docker build -t test-image ./docker --file Dockerfile
+        - run: docker build -t test-image . --file /docker/Dockerfile
